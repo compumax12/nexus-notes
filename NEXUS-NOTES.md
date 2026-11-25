@@ -1,6 +1,6 @@
 # Nexus Notes
 
-Aplicación personal de tareas, notas dentro de tareas, pasos, porcentajes, prioridades y colaboración opcional. Código privado del propietario.
+Aplicación personal de tareas, notas dentro de tareas, pasos, porcentajes, prioridades y colaboración opcional. Código publicado en GitHub; tratar como público, sin datos personales ni secretos.
 
 ## Estado actual
 
@@ -13,7 +13,7 @@ Aplicación personal de tareas, notas dentro de tareas, pasos, porcentajes, prio
 
 ## Trabajar desde otra computadora
 
-1. Clonar el repositorio privado con Git o GitHub Desktop usando tu cuenta.
+1. Clonar el repositorio público con Git o GitHub Desktop usando tu cuenta.
 2. Instalar Node.js >=22.13.0 y Git.
 3. En la carpeta del proyecto ejecutar `npm run install:ci`.
 4. Ejecutar `npm run build` para generar la configuración local del Worker.
@@ -21,7 +21,7 @@ Aplicación personal de tareas, notas dentro de tareas, pasos, porcentajes, prio
    `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --config dist/server/wrangler.json --local --persist-to .wrangler/state --file drizzle/NOMBRE_DE_MIGRACION.sql`
 6. Ejecutar `npm run dev` y abrir la dirección local que indique. La vista local usa una cuenta ficticia y una base separada de producción.
 7. Validar con `node node_modules/typescript/bin/tsc --noEmit --incremental false`, `node --experimental-strip-types --test tests/task-logic.test.mjs` y `npm run build`.
-8. Guardar cambios con Git y enviarlos al repositorio privado. Descargar o modificar el código no actualiza automáticamente el sitio publicado.
+8. Guardar cambios con Git y enviarlos al repositorio público. Descargar o modificar el código no actualiza automáticamente el sitio publicado.
 
 El README del starter describe el runtime y los perfiles de ejecución. No subir `.env*`, `.wrangler`, copias de bases, `node_modules`, credenciales ni archivos de respaldo personales al repositorio.
 

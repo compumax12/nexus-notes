@@ -57,7 +57,7 @@ Desactivar una cuenta cierra sus sesiones y conserva sus datos. Reactivarla no r
 
 ## 2. Archivos que debes conservar
 
-- Fuente: esta carpeta, un archivo completo de la versión local o el repositorio privado de GitHub actualizado.
+- Fuente: esta carpeta, un archivo completo de la versión local o el repositorio público de GitHub actualizado.
 - Datos: el directorio NEXUS_DATA_DIR. Incluye `nexus.sqlite`, sus archivos WAL/SHM mientras esté abierto y `objects/` con los respaldos.
 - Respaldo de migración: descarga un JSON reciente desde Configuración del sitio antiguo, justo antes del traslado.
 - Guarda una copia fuera del NAS y del proveedor actual.
@@ -166,7 +166,7 @@ Referencias oficiales:
 
 La pantalla **Olvidé mi contraseña** envía un código de 8 dígitos al correo que pertenece a la cuenta (actualmente, el correo de su invitación). El código dura 10 minutos, admite 5 intentos y se consume una sola vez. Los reenvíos requieren un minuto, con máximo 3 por hora y cuenta. Una recuperación correcta cierra las sesiones e invalida el código de emergencia anterior. Se conserva la recuperación de emergencia como alternativa.
 
-Remitente inicial: `tu-correo@ejemplo.com`. La configuración permanece local y se puede cambiar por otro proveedor SMTP con TLS.
+El remitente `tu-correo@ejemplo.com` es solo un marcador ilustrativo: sustitúyelo por tu Gmail real. La configuración permanece local y se puede cambiar por otro proveedor SMTP con TLS.
 
 1. En la cuenta remitente, activa la verificación en dos pasos y crea una contraseña de aplicación para Nexus Notes. Introduce esa contraseña únicamente en tu equipo; no uses ni compartas la contraseña normal de Gmail.
 2. Guarda la contraseña de aplicación sin espacios en un archivo privado fuera del repositorio, legible solo por tu usuario (en TrueNAS, solo por el usuario del contenedor). No lo incluyas en el archivo del código.
@@ -191,12 +191,12 @@ Fuentes: [Contraseñas de aplicación de Google](https://support.google.com/acco
 
 ### Asistente de Gmail para Windows
 
-Desde PowerShell, ejecuta:
+Desde la raíz del proyecto, en PowerShell, ejecuta:
 
 ```powershell
-& "C:/Users/asist/Downloads/JARVIS-LISTO/sites/mis-pendientes-ti/selfhost/configure-gmail.ps1"
+.\selfhost\configure-gmail.ps1
 ```
 
-Acepta el remitente propuesto pulsando Enter e introduce tú mismo la contraseña de aplicación de Google en el campo oculto. El asistente guarda el secreto en `%LOCALAPPDATA%/NexusNotes/secrets/`, con permisos solo para tu usuario de Windows. Comprueba TLS y autenticación sin enviar correo; únicamente si funciona actualiza `.env.mail.local`. Si falla, elimina el archivo nuevo y conserva la configuración anterior. Al cambiar remitente, los archivos secretos anteriores no se eliminan automáticamente: retíralos cuando ya no los uses y revoca las contraseñas antiguas en Google.
+Introduce tu correo Gmail real (el marcador de ejemplo no es válido) y la contraseña de aplicación de Google en el campo oculto. El asistente guarda el secreto en `%LOCALAPPDATA%/NexusNotes/secrets/`, con permisos solo para tu usuario de Windows. Comprueba TLS y autenticación sin enviar correo; únicamente si funciona actualiza `.env.mail.local`. Si falla, elimina el archivo nuevo y conserva la configuración anterior. Al cambiar remitente, los archivos secretos anteriores no se eliminan automáticamente: retíralos cuando ya no los uses y revoca las contraseñas antiguas en Google.
 
 Después, reinicia el servidor local y comprueba la recepción usando **Olvidé mi contraseña** con una cuenta registrada. La comprobación SMTP no garantiza entrega en bandeja de entrada. Este asistente es para Windows; en TrueNAS utiliza un secreto montado como se explica arriba.
