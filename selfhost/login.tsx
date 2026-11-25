@@ -1,42 +1,41 @@
 'use client';
 import {useState} from 'react';
-import {LockKeyhole, Layers} from 'lucide-react';
 export default function Login(_props:{setup?:boolean}){
  const [email,setEmail]=useState('');
  const [mode,setMode]=useState('unlock'),[username,setUsername]=useState(''),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[code,setCode]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
- async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setMessage('');try{
+ const [tone,setTone]=useState<'error'|'success'>('success');
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setMessage('');setTone('success');try{
   const r=await fetch((mode==='redeem'||mode.startsWith('email-'))?'/api/recovery':'/api/lock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:mode,email,username,password,confirm,invitation:code,code,newPassword:password})});
   const data=await r.json() as {error?:string;message?:string;username?:string};if(!r.ok)throw new Error(data.error||'No se pudo acceder.');
   if(mode==='email-request'){setMode('email-redeem');setMessage(data.message||'Revisa tu correo.');return;}
   if(data.username)setUsername(data.username);
   setPassword('');setConfirm('');setCode('');if(mode==='unlock')window.location.replace('/');else{setMode('unlock');setMessage('Listo. Ahora inicia sesión.');}
- }catch(error){setMessage(error instanceof Error?error.message:'No hay conexión.');}finally{setBusy(false);}}
- return <main className="lock-page">
-  <div className="login-layout split">
-   <aside className="login-story">
-    <div className="lock-brand"><span className="brand-icon"><Layers size={24} aria-hidden="true"/></span>Nexus Notes</div>
-    <div className="login-message">
-     <p className="login-message-title">Configura tu acceso para continuar.</p>
-     <p className="muted">Tareas, apuntes y avances en tu servidor.</p>
-    </div>
-   </aside>
-   <section className="panel lock-card stack" aria-labelledby="login-title">
-    <span className="lock-emblem accent"><LockKeyhole size={28} aria-hidden="true"/></span>
-    <div className="section-head">
+ }catch(error){setTone('error');setMessage(error instanceof Error?error.message:'No hay conexión.');}finally{setBusy(false);}}
+ return (
+  <main className="lock-page">
+   <div className="login-layout">
+    <aside className="login-story">
+     <div className="lock-brand">Nexus Notes</div>
+     <div className="login-message">
+      <h2>Tu trabajo.<br/>Tu propio espacio.</h2>
+      <p className="login-support">Tareas, apuntes y avances en tu servidor.</p>
+     </div>
+    </aside>
+    <section className="lock-card" aria-labelledby="login-title">
      <h1 id="login-title">{mode==='setup'?'Crear mi cuenta':(mode==='redeem'||mode.startsWith('email-'))?'Recuperar acceso':'Bienvenido de nuevo'}</h1>
-     <p className="muted">{mode==='setup'?'Necesitas una invitación del administrador.':'Ingresa con tu cuenta de Nexus Notes.'}</p>
-    </div>
-    <form className="stack" onSubmit={submit}>
-     {mode.startsWith('email-')?<label className="stack" htmlFor="login-correo"><span>Correo registrado</span><input id="login-correo" className="field" type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>:<label className="stack" htmlFor="login-usuario"><span>Usuario</span><input id="login-usuario" className="field" autoComplete="username" required minLength={3} maxLength={60} value={username} onChange={e=>setUsername(e.target.value)}/></label>}
-     {mode!=='unlock'&&mode!=='email-request'&&<label className="stack" htmlFor="login-codigo"><span>{mode==='setup'?'Código de invitación':mode==='email-redeem'?'Código recibido por correo':'Código de emergencia'}</span><input id="login-codigo" className="field" required autoComplete="off" value={code} onChange={e=>setCode(e.target.value)} maxLength={mode==='email-redeem'?8:64} inputMode={mode==='email-redeem'?'numeric':'text'}/></label>}
-     {mode!=='email-request'&&<label className="stack" htmlFor="login-clave"><span>{mode==='unlock'?'Contraseña':'Nueva contraseña'}</span><input id="login-clave" className="field" type="password" autoComplete={mode==='unlock'?'current-password':'new-password'} required minLength={mode==='unlock'?1:12} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/></label>}
-     {mode!=='unlock'&&mode!=='email-request'&&<label className="stack" htmlFor="login-confirmacion"><span>Repetir contraseña</span><input id="login-confirmacion" className="field" required type="password" autoComplete="new-password" minLength={12} maxLength={128} value={confirm} onChange={e=>setConfirm(e.target.value)}/></label>}
-     {message&&<p role="status" className="muted">{message}</p>}
-     <button className="action action-primary" disabled={busy}>{busy?'Procesando…':mode==='unlock'?'Entrar':mode==='email-request'?'Enviar código':'Confirmar'}</button>
-    </form>
-    <div className="selfhost-login-actions">{[['unlock','Iniciar sesión'],['setup','Tengo invitación'],['email-request','Olvidé mi contraseña'],['redeem','Usar código de emergencia']].filter(([key])=>key!==mode).map(([key,label])=>
-     <button type="button" className="action action-quiet" disabled={busy} key={key} onClick={()=>{setMode(key);setPassword('');setConfirm('');setCode('');setMessage('');}}>{label}</button>)}</div>
-   </section>
-  </div>
- </main>;
+     <p>{mode==='setup'?'Necesitas una invitación del administrador.':'Ingresa con tu cuenta de Nexus Notes.'}</p>
+     <form onSubmit={submit}>
+      {mode.startsWith('email-')?<label>Correo registrado<input type="email" autoComplete="email" required maxLength={254} value={email} onChange={e=>setEmail(e.target.value)}/></label>:<label>Usuario<input autoComplete="username" required minLength={3} maxLength={60} value={username} onChange={e=>setUsername(e.target.value)}/></label>}
+      {mode!=='unlock'&&mode!=='email-request'&&<label>{mode==='setup'?'Código de invitación':mode==='email-redeem'?'Código recibido por correo':'Código de emergencia'}<input required autoComplete="off" value={code} onChange={e=>setCode(e.target.value)} maxLength={mode==='email-redeem'?8:64} inputMode={mode==='email-redeem'?'numeric':'text'}/></label>}
+      {mode!=='email-request'&&<label>{mode==='unlock'?'Contraseña':'Nueva contraseña'}<input type="password" autoComplete={mode==='unlock'?'current-password':'new-password'} required minLength={mode==='unlock'?1:12} maxLength={128} value={password} onChange={e=>setPassword(e.target.value)}/></label>}
+      {mode!=='unlock'&&mode!=='email-request'&&<label>Repetir contraseña<input required type="password" autoComplete="new-password" minLength={12} maxLength={128} value={confirm} onChange={e=>setConfirm(e.target.value)}/></label>}
+      {message&&<p role={tone==='error'?'alert':'status'} className={tone==='error'?'alert':'success'}>{message}</p>}
+      <button className="primary" disabled={busy}>{busy?'Procesando…':mode==='unlock'?'Entrar':mode==='email-request'?'Enviar código':'Confirmar'}</button>
+     </form>
+     <div className="selfhost-login-actions">{[['unlock','Iniciar sesión'],['setup','Tengo invitación'],['email-request','Olvidé mi contraseña'],['redeem','Usar código de emergencia']].filter(([key])=>key!==mode).map(([key,label])=>
+      <button type="button" className="secondary" disabled={busy} key={key} onClick={()=>{setMode(key);setPassword('');setConfirm('');setCode('');setMessage('');setTone('success');}}>{label}</button>)}</div>
+    </section>
+   </div>
+  </main>
+ );
 }

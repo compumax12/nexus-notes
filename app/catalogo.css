@@ -1,0 +1,312 @@
+/* Capa final de estilo catálogo: fondo blanco, menú superior y tarjetas amplias.
+   Se importa después de noche.css y solo cambia la presentación, nunca la lógica. */
+
+:root {
+  --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4F7FA; --line:#DDE5EC;
+  --text:#1B2A38; --muted:#566A7B; --accent:#17657D; --accent-ink:#FFFFFF;
+  --danger:#B32D27; --radius:18px;
+  --font-ui:Inter,"Segoe UI Variable","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-display:var(--font-ui);
+}
+
+/* Lienzo blanco y menú superior en escritorio. */
+html, body, .shell { background:#FFFFFF; }
+.shell::before { display:none; }
+
+.shell { display:block; }
+.sidebar {
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:16px;
+  width:100%;
+  height:auto;
+  min-height:64px;
+  padding:10px 32px;
+  border-right:0;
+  border-bottom:1px solid var(--line);
+  background:#fff;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.sidebar > .nav-label,
+.sidebar-tools .nav-label,
+.brand-word small { display:none; }
+.brand { margin:0; min-height:44px; font-size:18px; }
+.brand-icon { flex-basis:34px; width:34px; height:34px; border-radius:9px; }
+.workspace { margin:0; padding:8px 12px; border:0; background:transparent; }
+.sidebar nav {
+  display:flex;
+  flex:1 1 auto;
+  flex-direction:row;
+  gap:4px;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+.nav-item {
+  width:auto;
+  min-height:44px;
+  margin:0;
+  padding:10px 14px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.nav-item.selected::before { display:none; }
+.sidebar-tools { display:flex; gap:4px; margin:0 0 0 auto; padding:0; border:0; }
+.account { margin:0; padding:0 0 0 12px; border:0; }
+
+.topbar {
+  position:static;
+  height:56px;
+  padding:0 32px;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);
+}
+.content { max-width:1280px; padding:28px 32px 48px; }
+
+/* Tarjetas grandes y aireadas. */
+.panel,
+.panel-strong,
+.panel-quiet,
+.day-panel,
+.focus-card,
+.momentum-card,
+.queue-panel,
+.priority-card,
+.deadline-card,
+.recovery-form { padding:24px; border-radius:18px; }
+.task,
+.note-card,
+.row { padding:18px; border-radius:16px; }
+.focus-card { min-height:320px; }
+.today-grid, .stack { gap:18px; }
+.split { gap:22px; }
+.metric-strip { margin:22px 0 28px; }
+.heading h1 { font-weight:700; }
+.eyebrow::before { display:none; }
+.notification-panel, .toast-stack { top:124px; }
+
+/* Estados de interacción alineados con el acento azul del catálogo. */
+::selection { background:rgba(23,101,125,.15); }
+.action-primary:hover:not(:disabled),
+.primary:hover:not(:disabled),
+.lock-card .primary:hover:not(:disabled) { background:#0F5770; color:#fff; }
+.action-quiet:hover:not(:disabled),
+.secondary:hover:not(:disabled) { border-color:rgba(23,101,125,.35); background:#E8EFF4; }
+.nav-item.selected {
+  border-color:rgba(23,101,125,.3);
+  background:rgba(23,101,125,.06);
+  color:var(--accent);
+}
+.row:hover,
+.day-task:hover,
+.task:hover,
+.note-card:hover { border-color:rgba(23,101,125,.35); }
+.metric:hover,
+.radar-task:hover,
+.priority-map-row:hover { background:rgba(23,101,125,.06); }
+.priority-summary:hover { border-color:rgba(23,101,125,.3); }
+.tag-baja,
+.priority.baja {
+  border-color:rgba(23,101,125,.28);
+  background:rgba(23,101,125,.07);
+  color:#17657D;
+}
+
+/* Acceso: composición original sobre fondo claro. */
+.lock-page { background:#F4F7FA; padding:40px 20px; }
+.login-layout,
+.login-layout.split {
+  grid-template-columns:1fr 1fr;
+  width:min(960px,100%);
+  border:1px solid var(--line);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 20px 50px rgba(20,40,60,.08);
+}
+.login-story {
+  background:linear-gradient(145deg,#182B40,#1C3448 65%,#225366);
+  min-height:520px;
+  padding:36px;
+  color:#fff;
+}
+.lock-brand { color:#fff; font-size:22px; font-weight:700; margin:0 0 40px; }
+.login-message { margin-top:0; }
+.login-message .eyebrow {
+  color:#A6E3EE;
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:700;
+}
+.login-message h2,
+.login-message p.login-message-title {
+  color:#fff;
+  font-size:clamp(24px,2.4vw,30px);
+  font-weight:650;
+  line-height:1.25;
+  margin-top:14px;
+}
+.login-message h2 span { color:#9CE1EA; }
+.login-message p:not(.login-message-title) {
+  color:#C6DEE9;
+  font-size:13px;
+  line-height:1.7;
+  margin-top:16px;
+}
+.login-illustration {
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:22px;
+  height:135px;
+  margin-top:20px;
+  padding:15px 0;
+}
+.illustration-note,
+.illustration-chart,
+.illustration-check { border:1px solid #46778D; background:#22455977; border-radius:11px; }
+.illustration-note { width:84px; height:57px; padding:15px 12px; position:relative; }
+.illustration-note i { display:block; height:2px; width:39px; margin-bottom:7px; background:#8ED4E2; }
+.illustration-note i:nth-child(2) { width:26px; }
+.illustration-note span {
+  position:absolute;
+  right:13px;
+  bottom:13px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#79D6CF;
+}
+.illustration-chart {
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  height:88px;
+  width:99px;
+  padding:16px 14px;
+}
+.illustration-chart i { width:7px; border-radius:5px; background:#80D3E4; height:25%; }
+.illustration-chart i:nth-child(2) { height:48%; }
+.illustration-chart i:nth-child(3) { height:72%; }
+.illustration-chart i:nth-child(4) { height:95%; }
+.illustration-check {
+  display:grid;
+  place-items:center;
+  width:51px;
+  height:51px;
+  margin-bottom:5px;
+  border-radius:14px;
+  color:#98E4DD;
+}
+.login-pills { display:flex; gap:8px; margin-top:auto; padding-top:24px; }
+.login-pills span {
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:7px;
+  padding:5px 9px;
+  color:#DCECF2;
+  font-size:11px;
+}
+.lock-card {
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  width:auto;
+  max-width:none;
+  padding:48px 40px;
+  border:0;
+  border-radius:0 19px 19px 0;
+  background:#fff;
+  text-align:left;
+  box-shadow:none;
+}
+.lock-emblem { display:none; }
+.lock-card .eyebrow {
+  color:#17657D;
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:700;
+}
+.lock-card h1 { color:#1B2A38; font-size:26px; font-weight:700; margin-top:12px; }
+.lock-card > p { color:#566A7B; font-size:13px; line-height:1.7; margin-top:12px; }
+.lock-card form { margin-top:24px; }
+.lock-card form label { color:#42576A; font-size:12px; font-weight:600; margin-bottom:14px; }
+.lock-card form input,
+.lock-page .lock-card form input {
+  min-height:46px;
+  background:#fff;
+  border:1px solid #D5E0E9;
+  border-radius:9px;
+  color:#1B2A38;
+}
+.lock-card .primary,
+.lock-card form .primary {
+  width:100%;
+  min-height:46px;
+  margin-top:8px;
+  padding:12px 16px;
+  border-radius:9px;
+  justify-content:space-between;
+  background:#17657D;
+  color:#fff;
+}
+.lock-hint, .lock-card .lock-hint { color:#566A7B; font-size:11px; }
+.lock-signout {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding:0 8px;
+  color:var(--accent);
+  font-size:11px;
+}
+.selfhost-login-actions .secondary { min-height:44px; }
+.lock-card > .alert { color:var(--danger); }
+.lock-card > .success { color:var(--accent); }
+
+@media (max-width:850px) {
+  .focus-card { min-height:320px !important; }
+}
+
+/* Móvil: la navegación sigue arriba, nunca abajo. */
+@media (max-width:640px) {
+  .shell { padding-bottom:0; }
+  .sidebar {
+    position:sticky;
+    top:0;
+    right:auto;
+    bottom:auto;
+    left:auto;
+    z-index:50;
+    min-height:60px;
+    padding:6px 12px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-top:0;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+    backdrop-filter:none;
+  }
+  .sidebar > .brand,
+  .sidebar > .workspace,
+  .sidebar > .account { display:none; }
+  .sidebar nav { display:flex; flex:1; overflow-x:auto; }
+  .nav-item { min-width:44px; padding:0 12px; font-size:11px; }
+  .sidebar-tools .nav-item { width:44px; padding:0; justify-content:center; font-size:0; }
+  .topbar { position:static; padding:0 16px; }
+  .content { padding:20px 16px 32px; }
+  .login-layout,
+  .login-layout.split { grid-template-columns:1fr; max-width:440px; border-radius:16px; }
+  .login-story { min-height:0; padding:26px; }
+  .login-story .lock-brand { margin-bottom:20px; }
+  .login-message p:not(.login-message-title):not(.login-support),
+  .login-illustration,
+  .login-pills { display:none; }
+  .login-message p.login-message-title { display:block; font-size:22px; }
+  .notification-panel, .toast-stack { top:124px; }
+  .lock-card { padding:28px 24px; border-radius:0 0 15px 15px; }
+}
