@@ -1,0 +1,466 @@
+/* Bitácora local: papel frío, tinta de pizarra, señal para acción/urgencia
+   y verde reservado al avance. Selectores confinados a la vista Resumen. */
+.bitacora {
+  --papel: #EFF1EC;
+  --superficie: #FAFBF8;
+  --tinta: #1D2B28;
+  --pizarra: #182A2B;
+  --senal: #A9472B;
+  --progreso: #356A5E;
+  --linea: #C9D1C8;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --sans: "Aptos", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  display: grid;
+  grid-template-columns: minmax(0,1.8fr) minmax(280px,1fr);
+  gap: 30px 34px;
+  font-family: var(--sans);
+  color: var(--tinta);
+  color-scheme: light;
+  background: var(--papel);
+  margin-top: 8px;
+  padding: 24px 26px 28px;
+}
+
+.bitacora * {
+  font-variant-numeric: tabular-nums;
+}
+
+.bitacora-siguiente {
+  grid-column: 1;
+  grid-row: 1;
+  border-top: 2px solid var(--tinta);
+  padding-top: 18px;
+}
+
+.bitacora-estado {
+  grid-column: 2;
+  grid-row: 1;
+  border-left: 1px solid var(--linea);
+  padding-left: 24px;
+}
+
+.bitacora-frente {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+.bitacora-panel {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+}
+
+.bitacora-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5C6B64;
+}
+
+.bitacora-titulo {
+  font-family: var(--serif);
+  font-size: clamp(28px,3.2vw,40px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: 12px 0;
+  color: var(--tinta);
+  overflow-wrap: anywhere;
+}
+
+.bitacora-nota {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4B5D57;
+  max-width: 62ch;
+}
+
+.bitacora-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 16px 0 20px;
+  font-size: 13px;
+  color: #5C6B64;
+}
+
+.bitacora-continuar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  background: transparent;
+  color: var(--senal);
+  border-bottom: 2px solid var(--senal);
+  padding: 6px 0;
+  font-weight: 600;
+  width: fit-content;
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.bitacora-continuar:hover {
+  background: rgba(169,71,43,.09);
+}
+
+.bitacora-pie-tarea {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 18px;
+  margin-top: 24px;
+  padding-top: 13px;
+  border-top: 1px solid var(--linea);
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-porcentaje {
+  display: block;
+  margin: 14px 0 10px;
+  font-size: 46px;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--pizarra);
+}
+
+.bitacora-porcentaje small {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.bitacora-linea {
+  display: block;
+  height: 4px;
+  background: #D8DED5;
+  overflow: hidden;
+}
+
+.bitacora-linea i {
+  display: block;
+  height: 100%;
+  background: var(--progreso);
+}
+
+.bitacora-estado > p {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #4B5D57;
+}
+
+.bitacora-contadores {
+  margin-top: 18px;
+  border-top: 1px solid var(--linea);
+}
+
+.bitacora-contador {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 0;
+  background: transparent;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+.bitacora-contador:hover {
+  background: rgba(24,42,43,.04);
+}
+
+.bitacora-contador strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bitacora-pie {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-cabecera {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-top: 2px solid var(--tinta);
+  padding-top: 14px;
+  margin-bottom: 6px;
+}
+
+.bitacora-cabecera h2 {
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.bitacora-cabecera > span {
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-texto {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  background: transparent;
+  color: var(--senal);
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 0;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.bitacora-texto:hover {
+  background: rgba(169,71,43,.09);
+}
+
+.bitacora-fila {
+  display: grid;
+  grid-template-columns: 32px minmax(0,1fr) 96px;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding: 15px 0;
+  background: transparent;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  color: var(--tinta);
+  font-family: var(--sans);
+}
+
+.bitacora-fila:hover {
+  background: rgba(24,42,43,.04);
+}
+
+.bitacora-orden {
+  color: #5C6B64;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bitacora-tarea {
+  min-width: 0;
+}
+
+.bitacora-tarea strong,
+.bitacora-tarea > span {
+  display: block;
+}
+
+.bitacora-tarea strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.bitacora-tarea > span {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-avance b {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.bitacora-vacio {
+  padding: 28px 0;
+  color: var(--tinta);
+  text-align: center;
+}
+
+.bitacora-vacio h3 {
+  margin: 12px 0 6px;
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--tinta);
+}
+
+.bitacora-vacio p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5C6B64;
+}
+
+.bitacora-nota-final {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-nota-final svg {
+  color: var(--tinta);
+  flex-shrink: 0;
+}
+
+.bitacora-aviso {
+  border: 1px solid var(--linea);
+  background: var(--superficie);
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.bitacora-aviso > svg {
+  flex-shrink: 0;
+  color: var(--senal);
+}
+
+.bitacora-aviso > div {
+  min-width: 0;
+}
+
+.bitacora-aviso span {
+  display: block;
+  font-size: 12px;
+  color: #5C6B64;
+}
+
+.bitacora-aviso strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--tinta);
+}
+
+.bitacora-aviso .bitacora-texto {
+  align-self: center;
+  margin-left: 0;
+}
+
+.bitacora-prioridades {
+  margin-top: 26px;
+}
+
+.bitacora-prioridad {
+  display: grid;
+  grid-template-columns: 58px minmax(0,1fr) 28px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 0;
+  background: transparent;
+  border-bottom: 1px solid var(--linea);
+  text-align: left;
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+.bitacora-prioridad:hover {
+  background: rgba(24,42,43,.04);
+}
+
+.bitacora-prioridad b {
+  text-align: right;
+  font-weight: 600;
+  color: #4B5D57;
+}
+
+.bitacora-prioridad .bitacora-linea i.alta {
+  background: var(--senal);
+}
+
+.bitacora-prioridad .bitacora-linea i.media {
+  background: var(--tinta);
+  opacity: .55;
+}
+
+.bitacora-prioridad .bitacora-linea i.baja {
+  background: var(--progreso);
+}
+
+.bitacora button:focus-visible {
+  outline: 2px solid var(--senal);
+  outline-offset: 3px;
+}
+
+@media (max-width:900px) {
+  .bitacora {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .bitacora-siguiente,
+  .bitacora-estado,
+  .bitacora-frente,
+  .bitacora-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .bitacora-estado {
+    border-left: 0;
+    border-top: 1px solid var(--linea);
+    padding-left: 0;
+    padding-top: 20px;
+  }
+
+  .bitacora-panel {
+    margin-top: 6px;
+  }
+}
+
+@media (max-width:640px) {
+  .bitacora {
+    gap: 22px;
+    padding: 18px 16px 24px;
+  }
+
+  .bitacora-titulo {
+    font-size: 28px;
+  }
+
+  .bitacora-fila {
+    grid-template-columns: minmax(0,1fr) 96px;
+    gap: 8px 14px;
+  }
+
+  .bitacora-orden {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .bitacora-tarea {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .bitacora-avance {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
+  .bitacora-continuar,
+  .bitacora-texto,
+  .bitacora-contador,
+  .bitacora-prioridad {
+    min-height: 44px;
+  }
+
+  .bitacora-aviso {
+    flex-wrap: wrap;
+  }
+
+  .bitacora-aviso .bitacora-texto {
+    margin-left: 36px;
+  }
+}

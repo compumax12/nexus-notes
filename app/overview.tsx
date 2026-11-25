@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, Check, CircleCheck, Layers, ListTodo, Orbit, Zap } from "lucide-react";
+import { CalendarDays, Check, CircleCheck } from "lucide-react";
 import type { Task } from "./dashboard";
 
 export default function Overview({ tasks, today, loading, open, navigate }: { tasks: Task[]; today: string; loading: boolean; open: (task: Task) => void; navigate: (view: string, priority?: string) => void }) {
@@ -9,20 +9,90 @@ export default function Overview({ tasks, today, loading, open, navigate }: { ta
   const average = tasks.length ? Math.round(tasks.reduce((sum,t)=>sum+t.progress,0)/tasks.length) : 0;
   const next = ordered[0];
   const due = ordered.filter(t=>t.due && t.due<=today).length;
-  return <div className="nexus-overview">
-    <section className="command-grid">
-      <article className="focus-card">
-        <div className="card-kicker"><span><Zap size={15}/> TU SIGUIENTE TAREA</span><span className="live-label">{ordered.length} por completar</span></div>
-        <div className="focus-content"><span className="focus-caption">{next ? "Continúa donde lo dejaste." : "Tu espacio. Tus próximos pasos."}</span><h2>{next?.title ?? (loading ? "Preparando tu espacio…" : "Dale lugar a tu próxima idea.")}</h2><p>{next?.steps.find(s=>!s.done)?.title ?? (next ? "Retoma esta tarea y registra lo que avanzaste." : "Crea una tarea, divídela en pasos y empieza a avanzar.")}</p>
-        {next && <div className="focus-tags"><span className={`priority ${next.priority.toLowerCase()}`}>Prioridad {next.priority}</span><span><CalendarDays size={13}/>{next.due ? next.due.split("-").reverse().join("/") : "Sin fecha límite"}</span></div>}
-        <button className="primary" onClick={()=>next ? open(next) : navigate("Todas las tareas")}>{next ? "Retomar tarea" : "Ir a mis tareas"}<ArrowUpRight size={17}/></button></div>
-        <div className="focus-orbit" aria-hidden="true"><div/><div/><Orbit size={72}/><span>{next ? `${next.progress}%` : "N"}</span></div>
-        <div className="focus-bottom"><span>Elegida por prioridad y fecha límite</span><span>{next ? (next.steps.length ? `${next.steps.filter(s=>s.done).length} / ${next.steps.length} pasos` : "Avance a tu ritmo") : "Todo comienza con una tarea"}</span></div>
-      </article>
-      <article className="momentum-card"><div className="card-kicker"><span>TU AVANCE</span><ArrowUpRight size={17}/></div><div className="orbital-meter" role="img" aria-label={`Avance promedio ${average}%`}><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="74" className="meter-base"/><circle cx="90" cy="90" r="74" className="meter-value" strokeDasharray={`${average*4.65} 465`}/></svg><div><strong>{average}<small>%</small></strong><span>avance promedio</span></div></div><p><b>{done} de {tasks.length}</b> tareas completadas</p><div className="completion-line"><i style={{width:`${tasks.length?done/tasks.length*100:0}%`}}/></div><span className="meter-footnote">Cada paso que completas cuenta.</span></article>
+  const counters = [
+    { label: "Todas las tareas", value: tasks.length, view: "Todas las tareas" },
+    { label: "Pendientes", value: pending, view: "Pendientes" },
+    { label: "En proceso", value: active, view: "En proceso" },
+    { label: "Terminados", value: done, view: "Terminados" },
+  ];
+  return <div className="nexus-overview bitacora">
+    <section className="bitacora-siguiente" aria-label="Siguiente tarea">
+      <div className="bitacora-label">Siguiente tarea</div>
+      <h2 className="bitacora-titulo">{next?.title ?? (loading ? "Preparando tu espacio…" : "Dale lugar a tu próxima idea.")}</h2>
+      <p className="bitacora-nota">{next?.steps.find(s=>!s.done)?.title ?? (next ? "Retoma esta tarea y registra lo que avanzaste." : "Crea una tarea, divídela en pasos y empieza a avanzar.")}</p>
+      <div className="bitacora-meta">
+        <span>{next ? `Prioridad ${next.priority}` : "Prioridad —"}</span>
+        <span>{next?.due ? next.due.split("-").reverse().join("/") : "Sin fecha límite"}</span>
+      </div>
+      <button className="bitacora-continuar" aria-label={next ? `Continuar con ${next.title}` : "Ir a todas las tareas"} onClick={()=>next ? open(next) : navigate("Todas las tareas")}>Continuar</button>
+      <div className="bitacora-pie-tarea">
+        <span>{ordered.length} por completar</span>
+        <span>{next ? (next.steps.length ? `${next.steps.filter(s=>s.done).length} / ${next.steps.length} pasos` : "Avance a tu ritmo") : "Todo comienza con una tarea"}</span>
+      </div>
     </section>
-    <section className="metric-strip" aria-label="Estados de las tareas">{[{label:"Todas las tareas",value:tasks.length,icon:Layers,tone:"violet",view:"Todas las tareas"},{label:"Pendientes",value:pending,icon:ListTodo,tone:"blue",view:"Pendientes"},{label:"En proceso",value:active,icon:Zap,tone:"amber",view:"En proceso"},{label:"Completadas",value:done,icon:CircleCheck,tone:"mint",view:"Terminados"}].map(({label,value,icon:Icon,tone,view})=><button key={label} className={`metric ${tone}`} onClick={()=>navigate(view)}><span className="metric-icon"><Icon size={21}/></span><div><span>{label}</span><strong>{loading&&!tasks.length?"—":String(value).padStart(2,"0")}</strong></div><ArrowUpRight className="metric-arrow" size={17}/></button>)}</section>
-    <section className="workspace-grid"><article className="queue-panel"><div className="new-panel-heading"><div><span className="eyebrow">DA EL SIGUIENTE PASO</span><h2>Próximas tareas <span>{ordered.length}</span></h2></div><button onClick={()=>navigate("Por completar")}>Ver todas <ArrowUpRight size={15}/></button></div><div className="queue-labels"><span>TAREA / PRIORIDAD</span><span>AVANCE</span></div>{ordered.slice(0,4).map((t,index)=><button className="radar-task" key={t.id} onClick={()=>open(t)}><span className="radar-number">{String(index+1).padStart(2,"0")}</span><div className="radar-title"><strong>{t.title}</strong><span><i className={`priority-dot ${t.priority.toLowerCase()}`}/>{t.priority}{t.due ? ` · ${t.due.split("-").reverse().join("/")}` : " · Sin fecha"}{t.shared ? " · Compartida" : ""}</span></div><div className="radar-progress"><b>{t.progress}%</b><div className="track"><i style={{width:`${t.progress}%`}}/></div></div><ArrowUpRight size={17}/></button>)}{!ordered.length&&<div className="radar-empty"><CircleCheck size={32}/><h3>{loading?"Cargando…":"Tienes el camino despejado"}</h3><p>Las tareas abiertas aparecerán aquí, ordenadas por prioridad.</p></div>}<div className="radar-footer"><Check size={14}/> Tus notas y pasos están dentro de cada tarea.</div></article>
-    <aside className="insight-column"><article className="deadline-card"><CalendarDays size={21}/><div><span>HOY Y VENCIDAS</span><strong>{due ? `${due} ${due===1?"tarea necesita":"tareas necesitan"} atención` : "Sin vencimientos pendientes"}</strong></div><button aria-label="Ver tareas de hoy" onClick={()=>navigate("Hoy")}><ArrowUpRight size={20}/></button></article><article className="priority-card"><div className="new-panel-heading"><h2>Por prioridad</h2><span>Abiertas</span></div>{(["Alta","Media","Baja"] as const).map(p=>{const count=ordered.filter(t=>t.priority===p).length;return <button className="priority-map-row" key={p} onClick={()=>navigate("Por completar",p)}><span><i className={`priority-dot ${p.toLowerCase()}`}/>{p}</span><div className="track"><i className={p.toLowerCase()} style={{width:`${ordered.length?count/ordered.length*100:0}%`}}/></div><b>{count}</b></button>;})}</article></aside></section>
+
+    <section className="bitacora-estado" aria-label="Estado del trabajo">
+      <span className="bitacora-label">Avance</span>
+      <strong className="bitacora-porcentaje">{average}<small>%</small></strong>
+      <div className="bitacora-linea" role="img" aria-label={`Avance promedio ${average}%`}><i style={{width:`${average}%`}}/></div>
+      <p>{done} de {tasks.length} tareas terminadas</p>
+      <div className="bitacora-contadores">
+        {counters.map(({ label, value, view }) => <button className="bitacora-contador" key={label} onClick={()=>navigate(view)}>
+          <span>{label}</span>
+          <strong>{loading && !tasks.length ? "—" : value}</strong>
+        </button>)}
+      </div>
+      <p className="bitacora-pie">Cada paso que completas cuenta.</p>
+    </section>
+
+    <section className="bitacora-frente" aria-label="Próximas tareas">
+      <div className="bitacora-cabecera">
+        <h2>Próximas tareas</h2>
+        <span>{ordered.length}</span>
+        <button className="bitacora-texto" onClick={()=>navigate("Por completar")}>Ver todas</button>
+      </div>
+      {ordered.slice(0,4).map((t,index) => <button className="bitacora-fila" key={t.id} onClick={()=>open(t)}>
+        <span className="bitacora-orden">{String(index+1)}</span>
+        <span className="bitacora-tarea">
+          <strong>{t.title}</strong>
+          <span>{t.priority}{t.due ? ` · ${t.due.split("-").reverse().join("/")}` : " · Sin fecha"}{t.shared ? " · Compartida" : ""}</span>
+        </span>
+        <span className="bitacora-avance">
+          <b>{t.progress}%</b>
+          <span className="bitacora-linea"><i style={{width:`${t.progress}%`}}/></span>
+        </span>
+      </button>)}
+      {!ordered.length && <div className="bitacora-vacio">
+        <CircleCheck size={32}/>
+        <h3>{loading ? "Cargando…" : "Tienes el camino despejado"}</h3>
+        <p>Las tareas abiertas aparecerán aquí, ordenadas por prioridad.</p>
+      </div>}
+      <p className="bitacora-nota-final"><Check size={14}/> Tus notas y pasos están dentro de cada tarea.</p>
+    </section>
+
+    <aside className="bitacora-panel" aria-label="Vencimientos y prioridades">
+      <div className="bitacora-aviso">
+        <CalendarDays size={21}/>
+        <div>
+          <span>Hoy y vencidas</span>
+          <strong>{due ? `${due} ${due===1 ? "tarea necesita" : "tareas necesitan"} atención` : "Sin vencimientos pendientes"}</strong>
+        </div>
+        <button className="bitacora-texto" aria-label="Ver tareas de hoy" onClick={()=>navigate("Hoy")}>Ver hoy</button>
+      </div>
+      <div className="bitacora-prioridades">
+        <div className="bitacora-cabecera">
+          <h2>Por prioridad</h2>
+          <span>Abiertas</span>
+        </div>
+        {(["Alta","Media","Baja"] as const).map(p => {
+          const count = ordered.filter(t => t.priority === p).length;
+          return <button className="bitacora-prioridad" key={p} onClick={()=>navigate("Por completar",p)}>
+            <span>{p}</span>
+            <span className="bitacora-linea"><i className={p.toLowerCase()} style={{width:`${ordered.length ? count/ordered.length*100 : 0}%`}}/></span>
+            <b>{count}</b>
+          </button>;
+        })}
+      </div>
+    </aside>
   </div>;
 }
