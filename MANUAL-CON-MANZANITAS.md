@@ -59,7 +59,7 @@ El repositorio privado es https://github.com/compumax12/nexus-notes. Compartir t
 | `tests/` | Pruebas con datos separados | Antes de publicar cambios importantes |
 | `public/` | Iconos y archivos estáticos | Cambios de iconos |
 | `components/`, `hooks/`, `lib/` | Piezas y utilidades reutilizables | Cambios de componentes o funciones comunes |
-| `app/clean-theme.css`, `workspace.css`, `globals.css` | Colores, espacios y tamaños | Si algo se ve desordenado |
+| `app/clean-theme.css`, `workspace.css`, `globals.css`, `noche.css` | Colores, espacios y tamaños | Si algo se ve desordenado |
 | `package.json` | Lista de piezas necesarias y comandos | Para instalar, compilar y arrancar |
 | `package-lock.json` | Versiones concretas de esas piezas | Para reproducir una instalación |
 | `.openai/hosting.json` | Identidad y almacenamiento del sitio publicado | Despliegue en Sites; no cambies su identificador |

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./workspace.css";
 import "./clean-theme.css";
-import "./bitacora.css";
+import "./noche.css";
 
 export const metadata: Metadata = {
   title: "Nexus Notes · Trabajos y pendientes",
