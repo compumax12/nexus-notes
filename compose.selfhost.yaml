@@ -1,0 +1,27 @@
+services:
+  nexus:
+    image: nexus-notes:local
+    build:
+      context: .
+      dockerfile: Dockerfile.selfhost
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "${NEXUS_BIND_IP:-127.0.0.1}:3000:3000"
+    environment:
+      NEXUS_ORIGIN: "${NEXUS_ORIGIN:-http://127.0.0.1:3000}"
+      NEXUS_DATA_DIR: /data
+      HOST: 0.0.0.0
+      PORT: "3000"
+    volumes:
+      - type: bind
+        source: "${NEXUS_DATA_PATH:?Set an absolute dataset path}"
+        target: /data

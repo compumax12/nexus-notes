@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+import {mkdtemp,rm} from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import {openStorage} from '../selfhost/storage.mjs';
+import {accounts,digest} from '../selfhost/accounts.mjs';
+const directory=await mkdtemp(path.join(os.tmpdir(),'nexus-accounts-'));
+const storage=openStorage({dataDirectory:directory,migrationsDirectory:path.resolve('drizzle')});
+try{
+ const service=await accounts(storage.DB),password=randomBytes(24).toString('base64url');
+ const old=await service.invite('person@example.test','Person'),current=await service.invite('person@example.test','Person');
+ await assert.rejects(service.register({invitation:old,username:'person',password,confirm:password}));
+ await service.register({invitation:current,username:'person',password,confirm:password});
+ await assert.rejects(service.register({invitation:current,username:'other',password,confirm:password}));
+ const expired=await service.invite('expired@example.test','Expired');
+ await storage.DB.prepare('UPDATE local_invites SET expires=0 WHERE hash=?').bind(digest(expired)).run();
+ await assert.rejects(service.register({invitation:expired,username:'expired',password,confirm:password}));
+ const session=await service.login('person',password),identity=await service.identity(session);
+ const emergency=await service.generate(identity,password),next=randomBytes(24).toString('base64url');
+ const results=await Promise.allSettled([service.redeem('person',emergency.code,next,next),service.redeem('person',emergency.code,next,next)]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+ assert.equal(await service.identity(session),null);
+ const second=await service.login('person',next),who=await service.identity(second);
+ const code=await service.generate(who,next);
+ await service.change(who,next,password,password);
+ assert.equal(await service.identity(second),null);
+ await assert.rejects(service.redeem('person',code.code,next,next));
+ const third=await service.login('person',password);await service.disable('person');
+ assert.equal(await service.identity(third),null);await assert.rejects(service.login('person',password));
+ console.log('PASS: invitation replacement/expiry/single use, concurrent recovery consumption, password-change revocation and account disable.');
+}finally{storage.close();await rm(directory,{recursive:true,force:true});}

@@ -1,0 +1,15 @@
+node_modules
+.git
+.env*
+.wrangler
+.sites-runtime
+.nexus-data
+dist
+dist-selfhost
+.next
+.vinext
+*.tsbuildinfo
+outputs
+work
+*.tar.gz
+*.bundle

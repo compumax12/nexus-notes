@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `shared_with` text DEFAULT '[]' NOT NULL;

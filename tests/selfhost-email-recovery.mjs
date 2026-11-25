@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+import {mkdtemp,rm} from 'node:fs/promises';import os from 'node:os';import path from 'node:path';
+import {openStorage} from '../selfhost/storage.mjs';import {accounts} from '../selfhost/accounts.mjs';import {emailRecovery} from '../selfhost/email-recovery.mjs';
+const dir=await mkdtemp(path.join(os.tmpdir(),'nexus-mail-test-')),storage=openStorage({dataDirectory:dir,migrationsDirectory:path.resolve('drizzle')});
+try{
+ const a=await accounts(storage.DB),password=randomBytes(24).toString('base64url'),next=randomBytes(24).toString('base64url');
+ const invitation=await a.invite('one@example.test','One');await a.register({invitation,username:'one',password,confirm:password});
+ const session=await a.login('one',password);let time=Date.now(),messages=[];
+ const recovery=await emailRecovery(storage.DB,async(to,code)=>messages.push({to,code}),()=>time);
+ await recovery.request('unknown@example.test');assert.equal(messages.length,0);
+ await recovery.request('ONE@example.test');assert.equal(messages[0].to,'one@example.test');assert.match(messages[0].code,/^\d{8}$/);
+ await recovery.request('one@example.test');assert.equal(messages.length,1);
+ const first=messages[0].code;
+ time+=61000;await recovery.request('one@example.test');assert.equal(messages.length,2);
+ await assert.rejects(recovery.redeem('one@example.test',first,next,next));
+ await assert.rejects(recovery.redeem('unknown@example.test',messages[1].code,next,next));
+ const results=await Promise.allSettled([recovery.redeem('one@example.test',messages[1].code,next,next),recovery.redeem('one@example.test',messages[1].code,next,next)]);
+ assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(await a.identity(session),null);
+ await assert.rejects(recovery.redeem('one@example.test',messages[1].code,password,password));
+ time+=61000;await recovery.request('one@example.test');assert.equal(messages.length,3);
+ time+=61000;await recovery.request('one@example.test');assert.equal(messages.length,3,'three sends per hour');
+ time+=3600001;await recovery.request('one@example.test');const code=messages.at(-1).code;
+ const wrong=code==='00000000'?'11111111':'00000000';
+ for(let i=0;i<5;i++)await assert.rejects(recovery.redeem('one@example.test',wrong,password,password));
+ await assert.rejects(recovery.redeem('one@example.test',code,password,password));
+ time+=61000;await recovery.request('one@example.test');time+=600001;
+ await assert.rejects(recovery.redeem('one@example.test',messages.at(-1).code,password,password));
+ time+=3600001;await recovery.request('one@example.test');
+ const currentSession=await a.login('one',next);await a.change(await a.identity(currentSession),next,password,password);
+ await assert.rejects(recovery.redeem('one@example.test',messages.at(-1).code,next,next));
+ await a.disable('one');time+=61000;const count=messages.length;await recovery.request('one@example.test');assert.equal(messages.length,count);
+ console.log('PASS: registered recipient only, cooldown, hourly limits, replaced/expired/used codes, five attempts, concurrent single-use, session revocation, password-change invalidation, inactive accounts. No real mail sent.');
+}finally{storage.close();await rm(dir,{recursive:true,force:true});}

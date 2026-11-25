@@ -1,0 +1,25 @@
+import type { Metadata } from "next";
+import "./globals.css";
+import "./workspace.css";
+import "./clean-theme.css";
+
+export const metadata: Metadata = {
+  title: "Nexus Notes · Trabajos y pendientes",
+  description: "Tus pendientes, avances e historial de soporte en un solo lugar.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="es">
+      <body className="antialiased">{children}</body>
+    </html>
+  );
+}

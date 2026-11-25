@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `steps` text DEFAULT '[]' NOT NULL;
