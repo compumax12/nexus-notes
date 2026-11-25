@@ -7,6 +7,7 @@ import { isUnlocked, LOCK_COOKIE } from "../../app-lock";
 import { digest, equalHash, passwordHash, randomToken } from "../../lock-crypto";
 import { getDb } from "../../../db";
 import { appLocks } from "../../../db/schema";
+import { recoveryCodeExpired } from "../../../lib/recovery-ttl.mjs";
 export const dynamic="force-dynamic";
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store"}});
 const input=z.object({action:z.enum(["generate","redeem"]),password:z.string().max(128).optional(),code:z.string().max(100).optional(),newPassword:z.string().min(12).max(128).optional(),confirm:z.string().max(128).optional()});
@@ -24,6 +25,8 @@ export async function POST(request:Request){
  try{
   const db=getDb();const row=(await db.select().from(appLocks).where(eq(appLocks.owner,user.userId)))[0];if(!row)return json({error:"Primero configura tu acceso."},400);
   const now=Date.now(),cutoff=now-15*60*1000;
+  const normalized=action==="redeem"?(code??"").replace(/[\s-]/g,"").toLowerCase():"";
+  if(action==="redeem"&&(!/^[a-f0-9]{48}$/.test(normalized)||!row.recoveryHash||recoveryCodeExpired(row.recoveryCreatedAt,now)))return json({error:"Código de emergencia incorrecto o ya utilizado."},401);
   const attempt=await db.update(appLocks).set({attempts:sql`CASE WHEN ${appLocks.windowStart} <= ${cutoff} THEN 1 ELSE ${appLocks.attempts}+1 END`,windowStart:sql`CASE WHEN ${appLocks.windowStart} <= ${cutoff} THEN ${now} ELSE ${appLocks.windowStart} END`}).where(and(eq(appLocks.owner,user.userId),sql`(${appLocks.windowStart} <= ${cutoff} OR ${appLocks.attempts}<5)`)).returning({owner:appLocks.owner});
   if(!attempt.length)return json({error:"Demasiados intentos. Espera 15 minutos desde el primer intento."},429);
   if(action==="generate"){
@@ -33,8 +36,7 @@ export async function POST(request:Request){
    if(!result.length)return json({error:"Tu acceso cambió. Inicia sesión otra vez."},409);
    return json({code:value.match(/.{8}/g)!.join("-"),createdAt});
   }
-  const normalized=(code??"").replace(/[\s-]/g,"").toLowerCase();
-  if(!/^[a-f0-9]{48}$/.test(normalized)||!row.recoveryHash||!equalHash(await digest(normalized),row.recoveryHash))return json({error:"Código de emergencia incorrecto o ya utilizado."},401);
+  if(!equalHash(await digest(normalized),row.recoveryHash))return json({error:"Código de emergencia incorrecto o ya utilizado."},401);
   const salt=randomToken(16);if(!env.DB)throw new Error("DB unavailable");
   const result=await env.DB.batch([
    env.DB.prepare("UPDATE app_locks SET salt=?,password_hash=?,recovery_hash='',recovery_created_at='',attempts=0,window_start=0 WHERE owner=? AND recovery_hash=? AND password_hash=? RETURNING username").bind(salt,await passwordHash(newPassword!,salt),user.userId,row.recoveryHash,row.passwordHash),

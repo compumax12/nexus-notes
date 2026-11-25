@@ -17,7 +17,20 @@ try{
  await storage.DB.prepare('UPDATE local_invites SET expires=0 WHERE hash=?').bind(digest(expired)).run();
  await assert.rejects(service.register({invitation:expired,username:'expired',password,confirm:password}));
  const session=await service.login('person',password),identity=await service.identity(session);
- const emergency=await service.generate(identity,password),next=randomBytes(24).toString('base64url');
+ const next=randomBytes(24).toString('base64url');
+ const stale=await service.generate(identity,password);
+ await storage.DB.prepare('UPDATE app_locks SET recovery_created_at=? WHERE owner=?').bind(new Date(Date.now()-900001).toISOString(),identity.userId).run();
+ const leerIntentos=()=>storage.DB.prepare('SELECT attempts,window_start,recovery_hash FROM app_locks WHERE owner=?').bind(identity.userId).first();
+ const antes=await leerIntentos();
+ await assert.rejects(service.redeem('person',stale.code,next,next),/Datos incorrectos/);
+ const despues=await leerIntentos();
+ assert.equal(despues.recovery_hash,digest(stale.code),'el hash permanece: el rechazo se debe al TTL');
+ assert.equal(despues.recovery_hash,antes.recovery_hash);
+ assert.deepEqual([despues.attempts,despues.window_start],[antes.attempts,antes.window_start],'un código vencido no consume intentos');
+ await assert.rejects(service.redeem('person','codigo-mal-formado',next,next),/Datos incorrectos/);
+ const trasMalformado=await leerIntentos();
+ assert.deepEqual([trasMalformado.attempts,trasMalformado.window_start],[antes.attempts,antes.window_start],'un código malformado no consume intentos');
+ const emergency=await service.generate(identity,password);
  const results=await Promise.allSettled([service.redeem('person',emergency.code,next,next),service.redeem('person',emergency.code,next,next)]);
  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
  assert.equal(await service.identity(session),null);
@@ -28,5 +41,5 @@ try{
  await assert.rejects(service.redeem('person',code.code,next,next));
  const third=await service.login('person',password);await service.disable('person');
  assert.equal(await service.identity(third),null);await assert.rejects(service.login('person',password));
- console.log('PASS: invitation replacement/expiry/single use, concurrent recovery consumption, password-change revocation and account disable.');
+ console.log('PASS: sustitución/caducidad de invitaciones, uso único, vencimiento de recuperación a los 15 minutos sin consumir intentos, consumo concurrente, revocación al cambiar contraseña y desactivación.');
 }finally{storage.close();await rm(directory,{recursive:true,force:true});}

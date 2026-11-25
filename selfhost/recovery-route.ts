@@ -7,7 +7,8 @@ import {input,json} from './http';
 export const dynamic='force-dynamic';
 export async function GET(){const user=await getChatGPTUser();if(!user)return json({error:'Inicia sesión.'},401);return json(await (await getAccounts()).recoveryStatus(user));}
 export async function POST(request:Request){try{
- const data=await input(request),service=await getAccounts();
+ const identity=await getChatGPTUser();
+ const data=await input(request,identity),service=await getAccounts();
  if(data.action==='email-request'){
   let send;try{send=recoveryMailer();}catch{return json({error:'El correo de recuperación aún no está configurado. Contacta al administrador.'},503);}
   await (await emailRecovery(getStorage().DB,send)).request(data.email);

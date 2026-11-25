@@ -1,5 +1,6 @@
 import {randomBytes,randomUUID,createHash,scrypt as derive,timingSafeEqual} from 'node:crypto';
 import {promisify} from 'node:util';
+import {recoveryCodeExpired} from '../lib/recovery-ttl.mjs';
 const scrypt=promisify(derive);
 export const digest=value=>createHash('sha256').update(value).digest('hex');
 const token=()=>randomBytes(32).toString('hex');
@@ -29,7 +30,7 @@ export async function accounts(DB){
  }
  return {
   isAdmin,
-  // Administrator grants stay local to the server console.
+  // Los permisos de administrador se gestionan solo desde la consola del servidor.
   async grantAdmin(username){const r=await row(username);if(!r)invalid();await DB.prepare('INSERT OR IGNORE INTO local_admins(account_id) VALUES(?)').bind(r.id).run();},
   async administration(identity,action,data={}){
    if(!await isAdmin(identity))throw new Error('Solo un administrador puede gestionar usuarios.');
@@ -95,8 +96,11 @@ export async function accounts(DB){
   },
   async redeem(username,code,newPassword,confirm){
    if(!passwordValid(newPassword)||newPassword!==confirm)invalid();
-   const r=await row(String(username??'').trim().toLowerCase());if(!r)invalid();await reserve(r.id);
-   if(!/^[a-f0-9]{64}$/.test(code??'')||!r.recovery_hash||!equal(digest(code),r.recovery_hash))invalid();
+   const r=await row(String(username??'').trim().toLowerCase());if(!r)invalid();
+   // Formato y vigencia se validan antes de reservar: un código inútil no consume intentos.
+   if(!/^[a-f0-9]{64}$/.test(code??'')||!r.recovery_hash||recoveryCodeExpired(r.recovery_created_at))invalid();
+   await reserve(r.id);
+   if(!equal(digest(code),r.recovery_hash))invalid();
    const salt=token(),ph=await hash(newPassword,salt);
    const result=await DB.batch([
     DB.prepare("UPDATE app_locks SET salt=?,password_hash=?,recovery_hash='',recovery_created_at='',attempts=0,window_start=0 WHERE owner=? AND recovery_hash=? RETURNING owner").bind(salt,ph,r.id,r.recovery_hash),

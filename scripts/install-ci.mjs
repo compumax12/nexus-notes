@@ -6,7 +6,7 @@ import { readExecutionProfile } from "./execution-profile.mjs";
 import { runNpmInstall } from "./npm-install.mjs";
 
 if (!process.env.npm_execpath) {
-  throw new Error("Run this installer with npm run install:ci.");
+  throw new Error("Ejecuta este instalador con npm run install:ci.");
 }
 
 if (![
@@ -26,14 +26,23 @@ if (readExecutionProfile() === "managed-linux") {
   process.exit(result.status ?? 1);
 }
 
-// Invoke npm's JavaScript entrypoint, avoiding platform-specific shell shims.
+// Invoca el punto de entrada JavaScript de npm para evitar shims de shell según la plataforma.
 const installed = await runNpmInstall([
   process.execPath,
     process.env.npm_execpath, "ci", "--prefix", projectRoot, "--workspaces=false",
-    "--include=dev", "--include=optional", "--prefer-offline", "--no-audit", "--no-fund",
+    "--include=dev", "--include=optional", "--prefer-offline", "--no-fund",
 ]);
 if (installed.signal) process.kill(process.pid, installed.signal);
 if (installed.code !== 0 || installed.signal) process.exit(installed.code || 1);
+
+// La auditoría va después de npm ci y falla con hallazgos altos o críticos.
+const audited = await runNpmInstall([
+  process.execPath,
+    process.env.npm_execpath, "audit", "--prefix", projectRoot,
+    "--workspaces=false", "--audit-level=high",
+]);
+if (audited.signal) process.kill(process.pid, audited.signal);
+if (audited.code !== 0 || audited.signal) process.exit(audited.code || 1);
 
 try {
   accessSync(
@@ -44,6 +53,6 @@ try {
     process.platform === "win32" ? constants.F_OK : constants.X_OK,
   );
 } catch {
-  console.error("npm ci exited successfully but the local vinext executable is unavailable.");
+  console.error("npm ci terminó correctamente, pero el ejecutable local de vinext no está disponible.");
   process.exitCode = 69;
 }

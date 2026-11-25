@@ -1,20 +1,20 @@
-/** Generic descriptor returned when maintenance service authorization is denied. */
+/** Descriptor genérico devuelto cuando se deniega la autorización de mantenimiento. */
 export type MaintenanceAuthFailure = {
   status: 401 | 503;
   error: string;
 };
 
-/** Deployment-specific behavior for missing secrets and accepted bearer headers. */
+/** Comportamiento según el despliegue para secretos ausentes y encabezados bearer aceptados. */
 export type MaintenanceAuthOptions = {
-  /** Status for an absent or short secret; defaults to 503 for Sites. */
+  /** Estado para un secreto ausente o corto; 503 por defecto en Sites. */
   missingSecretStatus?: 401 | 503;
-  /** Bearer headers to accept; defaults to Sites and selfhost headers. */
+  /** Encabezados bearer aceptados; por defecto Sites y autocontención. */
   allowedHeaders?: string[];
 };
 
 /**
- * Returns `null` when authorized, or a generic failure descriptor otherwise.
- * Any `Origin` is rejected; messages never include credentials.
+ * Devuelve `null` si autoriza o un descriptor genérico de fallo en caso contrario.
+ * Cualquier `Origin` se rechaza; los mensajes nunca incluyen credenciales.
  */
 export declare function maintenanceAuthFailure(
   request: Request,
