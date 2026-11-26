@@ -30,10 +30,10 @@ Por eso necesitas dos respaldos diferentes: **código en GitHub y datos fuera de
 La carpeta de trabajo actual es:
 
 ```text
-C:\Users\asist\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti
+C:\Users\TU_USUARIO\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti
 ```
 
-El repositorio privado es https://github.com/compumax12/nexus-notes. Compartir tus tareas en Nexus no da acceso al código en GitHub.
+El repositorio público es https://github.com/compumax12/nexus-notes. Compartir tus tareas en Nexus no da acceso al código en GitHub.
 
 ## 3. Qué hay en cada carpeta
 
@@ -162,7 +162,7 @@ No borres la base, no cambies permisos del NAS y no reinstales todo como primer 
 Abre PowerShell. Estos comandos son para la **versión autónoma**, no reparan por sí solos el sitio publicado.
 
 ```powershell
-Set-Location 'C:\Users\asist\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti'
+Set-Location 'C:\Users\TU_USUARIO\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti'
 node --version
 git status --short
 ```
@@ -189,7 +189,7 @@ Las pruebas autónomas usan datos temporales. La prueba de API utiliza el puerto
 Para iniciar la instalación local, usa siempre la misma ruta de datos:
 
 ```powershell
-$env:NEXUS_DATA_DIR = 'C:\Users\asist\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti\.nexus-data'
+$env:NEXUS_DATA_DIR = 'C:\Users\TU_USUARIO\Downloads\JARVIS-LISTO\sites\mis-pendientes-ti\.nexus-data'
 $env:NEXUS_ORIGIN = 'http://127.0.0.1:3000'
 $env:PORT = '3000'
 node selfhost/start.mjs
@@ -230,7 +230,7 @@ Si trabajas desde un clon normal de GitHub, normalmente el remoto se llama `orig
 git push -u github mejora-texto-resumen
 ```
 
-**No uses `--force`.** La historia de trabajo de Sites y la de GitHub se conservaron por separado. En esta carpeta no debes empujar `main` a ciegas: puede rechazar el envío por historias diferentes. Para trabajar desde casa, resulta más sencillo clonar el repositorio privado en una carpeta nueva y continuar su propia historia.
+**No uses `--force`.** La historia de trabajo de Sites y la de GitHub se conservaron por separado. En esta carpeta no debes empujar `main` a ciegas: puede rechazar el envío por historias diferentes. Para trabajar desde casa, resulta más sencillo clonar el repositorio público en una carpeta nueva y continuar su propia historia.
 
 No pegues una contraseña ni token en la URL del repositorio. Inicia sesión en GitHub mediante el mecanismo de autenticación de tu cliente.
 
