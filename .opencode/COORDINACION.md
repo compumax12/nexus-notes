@@ -4,7 +4,7 @@ Archivo compartido de comunicación entre agentes. **Leer al empezar, escribir a
 
 ## Repositorio público (decisión del usuario vigente)
 
-- El repositorio se hará público. Antes de cualquier push o cambio de visibilidad hay que pasar un escaneo de secretos/PII sobre **todo el historial**, no solo el árbol actual.
+- El repositorio es público y debe tratarse como tal. Antes de cualquier push hay que pasar un escaneo de secretos/PII sobre **todo el historial**, no solo el árbol actual.
 - NINGún agente debe imprimir ni compartir tokens, contraseñas, correos personales completos ni valores de credenciales en respuestas, logs, diffs de documentación ni mensajes de commit. Los hallazgos se reportan enmascarados (`ghp_***`, `c***@dominio`).
 - Si aparece un secreto real en el historial: rotarlo primero y advertir que reescribir historial requiere aprobación explícita del usuario. Nunca force push sin esa aprobación.
 - Los commits nuevos usan la identidad de no-reply de GitHub para no publicar el correo personal del autor.
@@ -83,3 +83,12 @@ Propiedad separada de archivos:
 - Documentación: `ESTADO.md` + `.opencode/COORDINACION.md`.
 
 Revisión: 3 programadores y 5 revisores. Seguridad aprobó sin hallazgos; las correcciones de privacidad, pruebas, interfaz y documentación quedaron aplicadas (referencia sin hostname, encabezados históricos aclarados, enlaces de acceso con 44 px, avisos sin solape, errores/aciertos distinguidos, eyebrows sin punto y estados en acento azul). Comprobaciones en verde: `npx tsc --noEmit`, `npm run lint` (0 errores, 11 advertencias preexistentes), `npm run build:selfhost`, `npm run build`, 9 pruebas automatizadas, smoke con `/api/health`=200 y Worker detenido, `npm audit` y `npm audit --omit=dev` en 0. Commit local al cerrar el ciclo; demo regenerada fuera del repo desde ese commit; push solo si el usuario lo solicita explícitamente.
+
+### app de escritorio Fase 1: cliente Electron del servidor central — COMPLETADO
+
+Ciclo mediano con 3 programadores (A, B y C) y 5 revisores. El usuario aprobó continuar con la Fase 1 el 26/11/2026.
+
+- Objetivo: ventana de escritorio para oficinas que apunta al servidor selfhost central, con tareas compartidas mediante las cuentas y los permisos actuales; no es BeeBEEP ni P2P.
+- Propiedad: A = `desktop/*` + `tests/desktop-url.test.mjs`; B = `package.json` + `ESCRITORIO.md` + `NEXUS-NOTES.md` + `LEEME-TRUENAS.md`; C = `AGENTS.md` + `ESTADO.md` + `.opencode/COORDINACION.md` (estos dos documentos).
+- Revisión: 5 dictámenes. Seguridad pidió cubrir redirecciones y marcos; pruebas pidió el handler completo de permisos; interfaz pidió tamaño de ventana y fallback de carga; documentación y privacidad aprobaron con matices. Todo aplicado por el agente principal.
+- Compuerta en verde: tipos, lint (0 errores, 11 advertencias preexistentes), ambos builds, 10 pruebas (URL de escritorio 18/18), smoke con `/api/health`=200 y Worker detenido, auditorías en 0. Diff limpio y sin secretos, correos reales ni rutas de usuario. Commit local y push en el cierre; demo regenerada desde el commit final.

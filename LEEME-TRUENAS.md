@@ -127,6 +127,8 @@ En TrueNAS entra en Apps → Discover Apps → Install via YAML, según tu versi
 6. Conserva el usuario 1000:1000, el volumen persistente y las restricciones del contenedor.
 7. Conecta el proxy inverso al puerto interno 3000. La publicación a 127.0.0.1 funciona solo para servicios del mismo host; un proxy en otro contenedor necesita una red Docker compartida o una dirección de escucha configurada y protegida. No hay proxy preseleccionado en este paquete.
 
+Los puestos de la oficina usan el cliente descrito en `ESCRITORIO.md`, apuntando a la URL HTTPS definitiva del servidor; no comparten sesiones ni datos locales.
+
 ## 6. HTTPS y dominio
 
 Fuera de localhost, la aplicación exige que NEXUS_ORIGIN use HTTPS. El proxy debe terminar TLS, conservar el host esperado y enviar `X-Forwarded-Proto: https`. Solo se acepta como host reenviado el host de NEXUS_ORIGIN. El puerto interno de Node debe ser accesible únicamente desde el proxy/red autorizada, porque se confía en ese proxy para el protocolo.

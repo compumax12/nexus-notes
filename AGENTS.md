@@ -25,6 +25,7 @@ node tests/maintenance-auth.test.mjs
 node tests/recovery-ttl.test.mjs
 node tests/task-logic.test.mjs
 node tests/service-status.test.mjs
+node tests/desktop-url.test.mjs
 npm run test:selfhost-storage
 node tests/selfhost-accounts.mjs
 node tests/selfhost-rate-limit.mjs

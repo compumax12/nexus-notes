@@ -96,6 +96,9 @@ dump*.json
 *.rar
 *.log
 
+# URL local de cada puesto de escritorio (no versionar)
+/desktop/url.local.txt
+
 # secretos locales / overrides
 secrets/
 credentials/

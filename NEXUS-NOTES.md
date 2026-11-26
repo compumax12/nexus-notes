@@ -8,8 +8,9 @@ Aplicación personal de tareas, notas dentro de tareas, pasos, porcentajes, prio
 - Recordatorios concretos con tarjetas flotantes y acceso a la tarea.
 - Configuración: exportación e importación de respaldos JSON, y cambio de contraseña adicional.
 - Cada cuenta tiene tareas privadas por defecto. El creador decide qué correos pueden ver y editar una tarea completa (incluye notas y pasos), y puede retirar permisos.
-- La entrada sigue dependiendo de ChatGPT y del acceso permitido por Sites. Añadir un correo a una tarea NO invita a esa persona a Sites automáticamente.
+- En el despliegue selfhost, la entrada usa las cuentas del propio servidor; en Sites depende de ChatGPT y del acceso permitido por Sites. Añadir un correo a una tarea NO crea una cuenta ni invita a esa persona a Sites automáticamente.
 - El repositorio contiene código, migraciones y pruebas. No contiene los datos de la base de producción, contraseñas de usuarios ni tokens.
+- Cliente de escritorio (Fase 1): instrucciones en `ESCRITORIO.md`; requiere el servidor selfhost central de la oficina y no sincroniza entre pares.
 
 ## Trabajar desde otra computadora
 

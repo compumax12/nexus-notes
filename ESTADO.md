@@ -80,3 +80,12 @@ Actualizado: 25/11/2026. Mantener esta lista al completar mejoras.
 - npm audit completo: cero vulnerabilidades conocidas en la copia local. No es una auditoría integral ni una garantía permanente.
 - Publicada la versión 18 el 28/10/2026: d3d5365b5809cb3d909167232c5860323345ee32. Añade alertas de disponibilidad y respaldos; conserva el uso compartido automático. Comprobación visual del 29/10: servidor responde, última copia del 28/10 y 8 tareas visibles. Variante autónoma conservada en el código; no instalada en TrueNAS.
 - Guía: LEEME-TRUENAS.md. No se incluyen contraseñas ni datos personales en los scripts de prueba.
+
+## Ciclo cerrado: cliente Electron del servidor central — COMPLETADO
+
+Ciclo mediano con 3 programadores (A, B y C) y 5 revisores. El usuario aprobó continuar con la Fase 1 el 26/11/2026.
+
+- Objetivo: ventana de escritorio para oficinas que apunta al servidor selfhost central, con tareas compartidas mediante las cuentas y los permisos actuales; no es BeeBEEP ni P2P.
+- Propiedad: A = `desktop/*` + `tests/desktop-url.test.mjs`; B = `package.json` + `ESCRITORIO.md` + `NEXUS-NOTES.md` + `LEEME-TRUENAS.md`; C = `AGENTS.md` + `ESTADO.md` + `.opencode/COORDINACION.md` (estos dos documentos).
+- Revisión: los 5 revisores dictaminaron; seguridad, privacidad, pruebas y documentación aprobaron, e interfaz señaló dos puntos altos. Se aplicaron navegación segura ante redirecciones y marcos, permisos completos, ventana de 1280x800 con mínimo 1024x768, pantalla de error local, lanzadores por puesto y textos exactos.
+- Evidencia: `npx tsc --noEmit`, `npm run lint` (0 errores, 11 advertencias preexistentes), `npm run build:selfhost`, `npm run build`, 10 pruebas automatizadas (la nueva de URL de escritorio 18/18), smoke con `/api/health`=200 y Worker detenido, `npm audit` y `npm audit --omit=dev` en 0. Escaneo del diff: 0 secretos, 0 correos reales y 0 rutas con nombre de usuario. Commit local y push en el cierre; demo regenerada fuera del repo desde el commit final.
